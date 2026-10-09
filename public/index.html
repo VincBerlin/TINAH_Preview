@@ -2,33 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#B7410E">
   <title>TINAH — Stay in Mawella</title>
   <meta name="description" content="A place to stay in Mawella, Sri Lanka. Book direct for better rates, explore our rooms and find your own rhythm by the sea.">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/assets/fonts/AllertaStencil-Regular.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="preload" href="/assets/wordmark.png" as="image">
-  <link rel="preload" href="/assets/hero-poster.jpg" as="image">
-  <link rel="stylesheet" href="/style.css?v=13">
+  <link rel="stylesheet" href="/style.css?v=14">
   <script src="/config.js" defer></script>
-  <script src="/app.js?v=8" type="module"></script>
+  <script src="/app.js?v=10" type="module"></script>
 </head>
 <body>
   <a class="skip-link" href="#book">Skip to booking</a>
   <main>
     <section class="hero" aria-label="TINAH, a place to stay in Mawella">
       <div class="hero-media">
-        <img class="hero-poster" src="/assets/hero-poster.jpg" alt="An aerial view of the coastline in Mawella" fetchpriority="high">
-        <video id="hero-video" muted loop playsinline preload="metadata" poster="/assets/hero-poster.jpg" aria-hidden="true"></video>
+        <picture>
+          <source media="(max-aspect-ratio: 7/10)" srcset="/media/hero-poster-portrait.webp" type="image/webp">
+          <source srcset="/media/hero-poster.webp" type="image/webp">
+          <img class="hero-poster" src="/media/hero-poster.jpg" alt="An aerial view of the coastline in Mawella" width="1920" height="1080" fetchpriority="high">
+        </picture>
+        <video id="hero-video" muted loop playsinline preload="metadata" aria-hidden="true"></video>
       </div>
       <header class="hero-header">
         <a class="location" href="#discover">MAWELLA, SRI LANKA</a>
       </header>
-      <svg class="wordmark" viewBox="627 426 818 1162" role="img" aria-label="TINAH brand mark">
-        <defs><filter id="black-ink" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1 0 0 0 1"/></filter></defs>
-        <image href="/assets/wordmark.png" width="2000" height="2000" filter="url(#black-ink)"/>
-      </svg>
+      <picture>
+        <source srcset="/media/wordmark.webp" type="image/webp">
+        <img class="wordmark" src="/media/wordmark.png" alt="TINAH – This is not a hotel" width="818" height="1162">
+      </picture>
       <div class="hero-bottom">
         <span>A place to stay.<br>A little closer to the sea.</span>
         <a class="scroll-link" href="#book" aria-label="Explore booking options"><span>MAKE YOURSELF AT HOME</span><span class="scroll-line" aria-hidden="true"></span></a>

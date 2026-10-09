@@ -109,3 +109,38 @@ h1,h2,.booking h1 em,.contact h2 em{font-family:"Allerta Stencil",sans-serif;fon
 @media(min-width:600px){.links-intro p{font-size:14px;margin-top:30px}}
 @media(min-width:900px){.link-section{row-gap:48px}.links-intro h1{font-size:36px}}
 
+
+/* Mobile refinements: legible small type over the video, a calm hero on every phone, touch feedback and safe areas. */
+.wordmark{object-fit:contain}
+.contact input[type=date]::-webkit-date-and-time-value{text-align:left;min-height:1.5em}
+@media(max-width:599px){:root{--gutter:max(24px,env(safe-area-inset-left),env(safe-area-inset-right))}}
+@media(min-width:600px) and (max-width:899px){:root{--gutter:max(6%,env(safe-area-inset-left),env(safe-area-inset-right))}}
+@media(max-width:899px),(orientation:landscape) and (max-height:500px){
+.hero:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(#00000052,#0000 22%,#0000 64%,#0000004d)}
+.hero-header,.hero-bottom{z-index:2;text-shadow:0 1px 2px #0006,0 0 14px #0005}
+.scroll-line{box-shadow:0 0 6px #0006}
+}
+@media(max-width:899px){
+.hero-header{padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) 0 max(20px,env(safe-area-inset-left))}
+.location{font-size:11px;letter-spacing:.12em;font-weight:600}
+.hero-bottom{bottom:max(24px,calc(env(safe-area-inset-bottom) + 12px));left:max(20px,env(safe-area-inset-left));right:max(20px,env(safe-area-inset-right));font-size:13px}
+.links-intro p{font-size:14px}
+.minimal-link{width:100%;min-height:52px}
+.section-label,.section-label>span{font-size:11px}
+.contact .form-field label,.stay-fields legend{font-size:13px}
+.optional{font-size:11px}
+.contact .form-note{font-size:12px}
+.contact ::placeholder{color:#fde3d3}
+.stay-error{color:#fff;font-weight:500}
+#copy-fallback{font-size:16px}
+footer,footer>a:last-child{font-size:12px}
+footer{padding-bottom:max(20px,calc(env(safe-area-inset-bottom) + 8px))}
+}
+@media(orientation:landscape) and (max-height:500px){
+.hero{min-height:300px}
+.wordmark{height:clamp(120px,46svh,220px)}
+.hero-bottom{bottom:max(14px,env(safe-area-inset-bottom));grid-template-columns:1fr auto 1fr;justify-items:stretch;align-items:end;gap:0;text-align:left}
+.scroll-link{grid-column:2}
+.link-section{min-height:0;padding-block:64px}
+}
+@media(hover:none){.minimal-link:active{color:#B7410E}.minimal-link:active .minimal-link-label:after{transform:scaleX(1)}.button:active{opacity:.85}.location:active,.text-link:active,.text-button:active{opacity:.7}}

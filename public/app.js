@@ -7,20 +7,47 @@ root.classList.add('js');
 
 let videoInView = true;
 video.muted = true;
-video.src = config.heroVideoUrl || '/assets/hero.mp4?v=original1080';
+// Portrait screens get the centre crop of the original (same pixels, a third of the data);
+// wider screens get the untouched Full HD original. Matches the poster's <source media>.
+const localVideo = { landscape: '/media/hero.mp4', portrait: '/media/hero-portrait.mp4' };
+const portraitView = matchMedia('(max-aspect-ratio: 7/10)');
+const saveData = navigator.connection?.saveData === true;
+let videoView = '';
 async function playVideo() {
-  if (reducedMotion.matches || document.hidden || !videoInView) return;
+  if (!videoView || reducedMotion.matches || document.hidden || !videoInView) return;
   try { await video.play(); } catch { /* Keep the poster if autoplay is unavailable. */ }
+}
+function loadVideo() {
+  const view = portraitView.matches ? 'portrait' : 'landscape';
+  if (saveData || view === videoView) return;
+  videoView = view;
+  video.classList.remove('playing');
+  video.src = config.heroVideo?.[view] || localVideo[view];
+  playVideo();
 }
 video.addEventListener('playing', () => video.classList.add('playing'));
 video.addEventListener('error', () => {
   video.classList.remove('playing');
-  if (video.getAttribute('src') !== '/assets/hero.mp4?v=original1080') {
-    video.src = '/assets/hero.mp4?v=original1080';
+  // A bucket URL failed: fall back to the copy bundled with the site.
+  if (videoView && video.getAttribute('src') !== localVideo[videoView]) {
+    video.src = localVideo[videoView];
     playVideo();
   }
 });
-playVideo();
+portraitView.addEventListener('change', loadVideo);
+loadVideo();
+
+// Same for images: bucket keys carry a content hash (wordmark.0ffcfdf93d72.png), the bundled copy does not.
+const localMedia = url => `/media/${new URL(url, location.href).pathname.split('/').pop().replace(/\.[0-9a-f]{12}(\.\w+)$/, '$1')}`;
+for (const image of document.querySelectorAll('picture img')) {
+  const fallback = () => {
+    if (new URL(image.currentSrc || image.src, location.href).origin === location.origin) return;
+    image.parentElement.querySelectorAll('source').forEach(source => { source.srcset = localMedia(source.srcset); });
+    image.src = localMedia(image.src);
+  };
+  image.addEventListener('error', fallback, { once: true });
+  if (image.complete && !image.naturalWidth && image.currentSrc) fallback();
+}
 
 const observer = new IntersectionObserver(entries => {
   entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
