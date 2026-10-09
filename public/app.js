@@ -37,18 +37,6 @@ video.addEventListener('error', () => {
 portraitView.addEventListener('change', loadVideo);
 loadVideo();
 
-// Same for images: bucket keys carry a content hash (wordmark.0ffcfdf93d72.png), the bundled copy does not.
-const localMedia = url => `/media/${new URL(url, location.href).pathname.split('/').pop().replace(/\.[0-9a-f]{12}(\.\w+)$/, '$1')}`;
-for (const image of document.querySelectorAll('picture img')) {
-  const fallback = () => {
-    if (new URL(image.currentSrc || image.src, location.href).origin === location.origin) return;
-    image.parentElement.querySelectorAll('source').forEach(source => { source.srcset = localMedia(source.srcset); });
-    image.src = localMedia(image.src);
-  };
-  image.addEventListener('error', fallback, { once: true });
-  if (image.complete && !image.naturalWidth && image.currentSrc) fallback();
-}
-
 const observer = new IntersectionObserver(entries => {
   entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
 }, { threshold: .12 });

@@ -1,4 +1,5 @@
-// Maps the files in public/media to bucket objects and decides, per file, where browsers load it from.
+// Maps the files in public/media (the hero videos; everything in that folder goes to the bucket)
+// to bucket objects and decides, per file, where browsers load it from.
 import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { readdir, stat } from 'node:fs/promises';

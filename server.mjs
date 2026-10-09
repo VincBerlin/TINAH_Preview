@@ -25,15 +25,8 @@ const media = createMediaResolver(await scanMedia(path.join(root, 'media')), buc
 await media.verify();
 media.watch();
 console.log(bucket
-  ? `Media: ${media.count()}/${media.total} files served from bucket ${bucket.name}; the rest from /media/`
-  : 'Media: no bucket configured, serving /media/ locally');
-
-// Media references in index.html (/media/<file>) become bucket URLs once the file is confirmed there.
-const escapeAttribute = value => value.replaceAll('&', '&amp;').replaceAll('"', '&quot;');
-async function renderIndex() {
-  const html = await readFile(path.join(root, 'index.html'), 'utf8');
-  return html.replace(/\/media\/([\w.-]+)/g, (match, name) => escapeAttribute(media.url(name) || match));
-}
+  ? `Video: ${media.count()}/${media.total} files served from bucket ${bucket.name}; the rest from /media/`
+  : 'Video: no bucket configured, serving /media/ locally');
 
 function send(req, res, status, headers, body) {
   const encoding = /\bbr\b/.test(req.headers['accept-encoding'] || '') ? 'br' : /\bgzip\b/.test(req.headers['accept-encoding'] || '') ? 'gzip' : null;
@@ -56,7 +49,8 @@ http.createServer(async (req, res) => {
       return send(req, res, 200, { 'Content-Type': types['.js'], 'Cache-Control': 'no-store' }, `window.TINAH_CONFIG = ${JSON.stringify(config)};`);
     }
     if (pathname === '/' || pathname === '/index.html') {
-      return send(req, res, 200, { 'Content-Type': types['.html'], 'Cache-Control': 'no-cache', ...(media.count() && { Link: `<${media.origin}>; rel=preconnect` }) }, await renderIndex());
+      // Opens the connection to the bucket while the page loads, so the video starts sooner.
+      return send(req, res, 200, { 'Content-Type': types['.html'], 'Cache-Control': 'no-cache', ...(media.count() && { Link: `<${media.origin}>; rel=preconnect` }) }, await readFile(path.join(root, 'index.html')));
     }
     const file = path.resolve(root, '.' + pathname);
     if (!file.startsWith(root)) { res.writeHead(403); return res.end(); }

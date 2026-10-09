@@ -11,22 +11,22 @@ npm start      # http://localhost:4173
 npm test       # signing, media mapping and bucket fallback
 ```
 
-All media lives in `public/media/` and is served locally when no bucket is configured. Wide screens get the full 26-second original (1920×1080, 60 fps, H.264, untouched). Portrait screens (aspect ratio up to 7:10, i.e. phones) get `hero-portrait.mp4`, the centre 720×1080 crop of the same footage: the pixels a phone shows anyway, at 14.7 MB instead of 52.8 MB. The posters follow the same rule (`hero-poster-portrait.webp` / `hero-poster.webp`, JPEG fallback). With Data Saver enabled, the poster stays and no video loads.
+The hero videos live in `public/media/`, the only folder that goes to the bucket; they are served locally when no bucket is configured. Poster, logo and font stay in `public/assets/` and are always served by the site itself. Wide screens get the full 26-second original (1920×1080, 60 fps, H.264, untouched). Portrait screens (aspect ratio up to 7:10, i.e. phones) get `hero-portrait.mp4`, the centre 720×1080 crop of the same footage: the pixels a phone shows anyway, at 14.7 MB instead of 52.8 MB. The posters follow the same rule (`hero-poster-portrait.webp` / `hero-poster.webp`, JPEG fallback). With Data Saver enabled, the poster stays and no video loads.
 
 ## Railway deployment with a Storage Bucket
 
 `railway.json` sets the start command (`npm start`) and the health check (`/health`). The server binds to `0.0.0.0` on Railway's `PORT`, compresses HTML/CSS/JS (Brotli or gzip) and caches versioned assets for a year.
 
-Railway buckets are private. The server therefore puts presigned bucket URLs into the page, and browsers load video and images directly from the bucket: bucket egress is free on Railway, service egress is not, and the Node service never streams the 50 MB video. Range requests (needed for video on iOS) work natively.
+Railway buckets are private. Only the video goes there. The server hands the page presigned bucket URLs for it, and browsers stream the video directly from the bucket: bucket egress is free on Railway, service egress is not, and the Node service never streams the 50 MB video. Range requests (needed for video on iOS) work natively.
 
 1. In the Railway project, create a bucket (e.g. `tinah-media`) next to the web service.
 2. In the web service's variables, reference the bucket's credentials: `BUCKET`, `ACCESS_KEY_ID`, `SECRET_ACCESS_KEY`, `ENDPOINT`, `REGION` (e.g. `BUCKET=${{tinah-media.BUCKET}}`). The AWS SDK preset names (`AWS_ACCESS_KEY_ID`, `AWS_ENDPOINT_URL_S3`, …) work too. Set `BUCKET_PATH_STYLE=true` only if the bucket's Credentials tab asks for path-style URLs.
-3. Upload the media once from this folder: `railway run npm run media:upload`. Re-running skips files that are already there; `npm run media:upload -- --dry-run` lists files and keys.
-4. Deploy (or redeploy). The log says how many files come from the bucket, e.g. `Media: 10/10 files served from bucket …`.
+3. Upload the videos once from this folder: `railway run npm run media:upload`. Re-running skips files that are already there; `npm run media:upload -- --dry-run` lists files and keys.
+4. Deploy (or redeploy). The log says how many files come from the bucket, e.g. `Video: 2/2 files served from bucket …`.
 
-Bucket keys contain a content hash (`media/hero.8e4db2b4c290.mp4`), stored with `Cache-Control: public, max-age=31536000, immutable`. Replace a file in `public/media/`, upload and deploy: it gets a new key, so nobody sees a stale copy. Signed URLs stay identical for three days (browsers cache the files) and remain valid for at least four more days.
+Bucket keys contain a content hash (`media/hero.8e4db2b4c290.mp4`), stored with `Cache-Control: public, max-age=31536000, immutable`. Replace a video in `public/media/`, upload and deploy: it gets a new key, so nobody sees a stale copy. Signed URLs stay identical for three days (browsers cache the video) and remain valid for at least four more days.
 
-Nothing breaks before the upload or when the bucket is unreachable: the server checks each file in the bucket at start and every 10 minutes and serves `/media/` for anything missing, and the page falls back to the bundled copy if a bucket image or video fails to load. Bucket credentials stay on the server; only signed, expiring URLs reach the browser.
+Nothing breaks before the upload or when the bucket is unreachable: the server checks each file in the bucket at start and every 10 minutes and serves `/media/` for anything missing, and the page falls back to the bundled copy if the bucket video fails to load. Bucket credentials stay on the server; only signed, expiring URLs reach the browser.
 
 The supplied Spotify link, `https://tr.ee/FuFQHdoNV4`, is the default; set `SPOTIFY_URL` only to override it. Variables are read when the server starts. `.env.example` documents them; for a local env file use `node --env-file=.env server.mjs`.
 
